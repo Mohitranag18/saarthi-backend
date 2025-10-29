@@ -48,6 +48,7 @@ PyJWT==2.10.1
 PySocks @ file:///work/perseverance-python-buildout/croot/pysocks_1728386193338/work
 python-dateutil==2.9.0.post0
 python-decouple==3.3
+python-dotenv==1.2.1
 pytz==2025.2
 PyYAML==6.0.2
 requests @ file:///croot/requests_1730999120400/work
