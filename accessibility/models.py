@@ -77,57 +77,57 @@ class AccessibilityReport(models.Model):
         ordering = ['-created_at']
 
 
-class EmergencyRequest(models.Model):
-    """
-    Model for emergency volunteer assistance requests
-    """
-    STATUS_CHOICES = (
-        ('pending', 'Pending'),
-        ('volunteer_found', 'Volunteer Found'),
-        ('in_progress', 'In Progress'),
-        ('completed', 'Completed'),
-        ('cancelled', 'Cancelled'),
-    )
+# class EmergencyRequest(models.Model):
+#     """
+#     Model for emergency volunteer assistance requests
+#     """
+#     STATUS_CHOICES = (
+#         ('pending', 'Pending'),
+#         ('volunteer_found', 'Volunteer Found'),
+#         ('in_progress', 'In Progress'),
+#         ('completed', 'Completed'),
+#         ('cancelled', 'Cancelled'),
+#     )
     
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='emergency_requests'
-    )
+#     user = models.ForeignKey(
+#         User,
+#         on_delete=models.CASCADE,
+#         related_name='emergency_requests'
+#     )
     
-    volunteer = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='emergency_assists'
-    )
+#     volunteer = models.ForeignKey(
+#         User,
+#         on_delete=models.SET_NULL,
+#         null=True,
+#         blank=True,
+#         related_name='emergency_assists'
+#     )
     
-    latitude = models.DecimalField(
-        max_digits=9,
-        decimal_places=6
-    )
-    longitude = models.DecimalField(
-        max_digits=9,
-        decimal_places=6
-    )
+#     latitude = models.DecimalField(
+#         max_digits=9,
+#         decimal_places=6
+#     )
+#     longitude = models.DecimalField(
+#         max_digits=9,
+#         decimal_places=6
+#     )
     
-    description = models.TextField(blank=True)
+#     description = models.TextField(blank=True)
     
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default='pending'
-    )
+#     status = models.CharField(
+#         max_length=20,
+#         choices=STATUS_CHOICES,
+#         default='pending'
+#     )
     
-    qr_verified = models.BooleanField(default=False)
+#     qr_verified = models.BooleanField(default=False)
     
-    created_at = models.DateTimeField(auto_now_add=True)
-    completed_at = models.DateTimeField(null=True, blank=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     completed_at = models.DateTimeField(null=True, blank=True)
     
-    def __str__(self):
-        return f"Emergency by {self.user.username} - {self.status}"
+#     def __str__(self):
+#         return f"Emergency by {self.user.username} - {self.status}"
     
-    class Meta:
-        db_table = 'emergency_requests'
-        ordering = ['-created_at']
+#     class Meta:
+#         db_table = 'emergency_requests'
+#         ordering = ['-created_at']
