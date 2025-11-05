@@ -22,6 +22,11 @@ class NoMapVolunteerForm(forms.ModelForm):
 @admin.register(EmergencyRequests)
 class EmergencyRequestsAdmin(admin.ModelAdmin):
     form = NoMapEmergencyForm
+    def save_model(self, request, obj, form, change):
+        if not change or not obj.user_id:
+            obj.user = request.user  # attach admin user automatically
+        super().save_model(request, obj, form, change)
+
 
 @admin.register(VolunteerLocations)
 class VolunteerLocationsAdmin(admin.ModelAdmin):

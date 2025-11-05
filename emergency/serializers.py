@@ -1,5 +1,6 @@
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from .models import EmergencyRequests,VolunteerLocations
+from rest_framework import serializers
 
 class EmergencyRequestSerializer(GeoFeatureModelSerializer):
     class Meta:
@@ -44,3 +45,9 @@ class VolunteerLocationSerializer(GeoFeatureModelSerializer):
         if request and hasattr(request, 'user'):
             validated_data['user'] = request.user
         return super().create(validated_data)
+    
+
+# class ResponseSerializer(serializers.Serializer):
+#     user_id = serializers.IntegerField()
+#     request_id = serializers.IntegerField()
+#     status = serializers.ChoiceField(choices=['accept', 'decline'])

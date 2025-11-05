@@ -1,14 +1,18 @@
 from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
+
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated,AllowAny
+from rest_framework.views import APIView
 
 from .models import EmergencyRequests, VolunteerLocations
 from .serializers import EmergencyRequestSerializer,VolunteerLocationSerializer
 
 from users.models import User
+
+
 class EmergencyRequestView(generics.CreateAPIView):
     queryset = EmergencyRequests.objects.all()
     serializer_class = EmergencyRequestSerializer
@@ -55,3 +59,38 @@ class VolunteerLocationView(generics.CreateAPIView):
     queryset= VolunteerLocations.objects.all()
     serializer_class = VolunteerLocationSerializer
     permission_classes = [AllowAny]    
+
+
+
+
+class RespondView(APIView):
+    permission_classes = [AllowAny]    
+    def post(self, request):
+        request_id = request.data.get("request_id")
+
+        # validate input
+        if not request_id:
+            return Response({"error": "Missing request_id"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            emergency = EmergencyRequests.objects.get(id=request_id)
+        except EmergencyRequests.DoesNotExist:
+            return Response({"error": "Request not found"}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            emergency.volunteer=User.objects.get(id=request.data.get("id"))
+        except User.DoesNotExist:
+            return Response({"error: kaun hai be?"},status=status.HTTP_400_BAD_REQUEST)
+        emergency.save()
+        location = emergency.location  # GeoDjango Point object
+
+        # convert Point to lat/lng
+        response_data = {
+            "status": "success",
+            "location": {
+                "latitude": location.y,
+                "longitude": location.x
+            }
+        }
+
+        return Response(response_data, status=status.HTTP_200_OK)
+

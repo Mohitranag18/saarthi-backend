@@ -1,7 +1,7 @@
 # from django.db import models
 from django.contrib.gis.db import models
 from django.contrib.auth import get_user_model
-
+import uuid
 User = get_user_model()
 # Create your models here.
 
@@ -35,7 +35,8 @@ class EmergencyRequests(models.Model):
         choices=STATUS_CHOICES,
         default='pending'
     )
-    
+
+    qr_key = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     qr_verified = models.BooleanField(default=False)
     
     created_at = models.DateTimeField(auto_now_add=True)
