@@ -1,133 +1,70 @@
+import uuid
 from django.db import models
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
+from django.conf import settings
 
 
 class AccessibilityReport(models.Model):
-    """
-    Model for community-submitted accessibility reports
-    """
-    REPORT_TYPE_CHOICES = (
-        ('ramp', 'Accessible Ramp'),
-        ('lift', 'Accessible Lift'),
-        ('blocked_path', 'Blocked Path'),
-        ('no_ramp', 'Missing Ramp'),
-        ('broken_lift', 'Broken Lift'),
-        ('tactile_path', 'Tactile Paving'),
-        ('obstacle', 'Obstacle'),
-        ('other', 'Other'),
-    )
+    SEVERITY_CHOICES = [
+        ('Low', 'Low'),
+        ('Medium', 'Medium'),
+        ('High', 'High'),
+        ('Critical', 'Critical'),
+    ]
     
-    STATUS_CHOICES = (
-        ('pending', 'Pending Verification'),
-        ('verified', 'Verified'),
-        ('resolved', 'Resolved'),
-        ('rejected', 'Rejected'),
-    )
+    STATUS_CHOICES = [
+        ('Active', 'Active'),
+        ('Resolved', 'Resolved'),
+        ('Under Review', 'Under Review'),
+        ('Duplicate', 'Duplicate'),
+    ]
     
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='accessibility_reports'
-    )
-    
-    report_type = models.CharField(
-        max_length=20,
-        choices=REPORT_TYPE_CHOICES
-    )
-    
-    title = models.CharField(max_length=200)
-    description = models.TextField()
-    
-    latitude = models.DecimalField(
-        max_digits=9,
-        decimal_places=6
-    )
-    longitude = models.DecimalField(
-        max_digits=9,
-        decimal_places=6
-    )
-    
-    address = models.TextField(blank=True, null=True)
-    
-    photo = models.ImageField(
-        upload_to='accessibility_reports/',
-        blank=True,
-        null=True
-    )
-    
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default='pending'
-    )
-    
-    upvotes = models.IntegerField(default=0)
-    downvotes = models.IntegerField(default=0)
-    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6)
+    problem_type = models.CharField(max_length=100)
+    disability_types = models.JSONField(default=list)
+    severity = models.CharField(max_length=20, choices=SEVERITY_CHOICES, default='Medium')
+    description = models.TextField(max_length=200)
+    photo_url = models.URLField(blank=True, null=True)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Active')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
-    def __str__(self):
-        return f"{self.title} - {self.report_type}"
-    
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
     class Meta:
-        db_table = 'accessibility_reports'
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['latitude', 'longitude']),
+            models.Index(fields=['severity', 'status']),
+            models.Index(fields=['created_at']),
+        ]
+
+    def __str__(self):
+        return f"{self.problem_type} ({self.severity}) - {self.status}"
 
 
-class EmergencyRequest(models.Model):
-    """
-    Model for emergency volunteer assistance requests
-    """
-    STATUS_CHOICES = (
-        ('pending', 'Pending'),
-        ('volunteer_found', 'Volunteer Found'),
-        ('in_progress', 'In Progress'),
-        ('completed', 'Completed'),
-        ('cancelled', 'Cancelled'),
-    )
+class RouteFeedback(models.Model):
+    RATING_CHOICES = [
+        (1, 'Very Poor'),
+        (2, 'Poor'),
+        (3, 'Average'),
+        (4, 'Good'),
+        (5, 'Excellent'),
+    ]
     
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='emergency_requests'
-    )
-    
-    volunteer = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='emergency_assists'
-    )
-    
-    latitude = models.DecimalField(
-        max_digits=9,
-        decimal_places=6
-    )
-    longitude = models.DecimalField(
-        max_digits=9,
-        decimal_places=6
-    )
-    
-    description = models.TextField(blank=True)
-    
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default='pending'
-    )
-    
-    qr_verified = models.BooleanField(default=False)
-    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    start_lat = models.DecimalField(max_digits=9, decimal_places=6)
+    start_lon = models.DecimalField(max_digits=9, decimal_places=6)
+    end_lat = models.DecimalField(max_digits=9, decimal_places=6)
+    end_lon = models.DecimalField(max_digits=9, decimal_places=6)
+    disability_type = models.CharField(max_length=50)
+    rating = models.IntegerField(choices=RATING_CHOICES)
+    comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    completed_at = models.DateTimeField(null=True, blank=True)
-    
-    def __str__(self):
-        return f"Emergency by {self.user.username} - {self.status}"
-    
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
     class Meta:
-        db_table = 'emergency_requests'
         ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Feedback: {self.rating}/5 - {self.disability_type}"
