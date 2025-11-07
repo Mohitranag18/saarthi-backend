@@ -311,7 +311,7 @@ class RouteCalculationView(APIView):
 
 
 class RouteFeedbackView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def post(self, request):
         """Submit feedback for a route."""
@@ -331,7 +331,7 @@ class RouteFeedbackView(APIView):
 
 
 class WeatherView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request):
         """Get current weather for a location."""
