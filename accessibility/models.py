@@ -53,10 +53,10 @@ class RouteFeedback(models.Model):
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    start_lat = models.DecimalField(max_digits=9, decimal_places=6)
-    start_lon = models.DecimalField(max_digits=9, decimal_places=6)
-    end_lat = models.DecimalField(max_digits=9, decimal_places=6)
-    end_lon = models.DecimalField(max_digits=9, decimal_places=6)
+    start_lat = models.DecimalField(max_digits=9, decimal_places=8)
+    start_lon = models.DecimalField(max_digits=9, decimal_places=8)
+    end_lat = models.DecimalField(max_digits=9, decimal_places=8)
+    end_lon = models.DecimalField(max_digits=9, decimal_places=8)
     disability_type = models.CharField(max_length=50)
     rating = models.IntegerField(choices=RATING_CHOICES)
     comment = models.TextField(blank=True)
