@@ -1,9 +1,11 @@
 from rest_framework import serializers
 from .models import AccessibilityReport, RouteFeedback
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.conf import settings
 from .storage import supabase_storage
 import os
+
+User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -118,7 +120,8 @@ class AccessibilityReportCreateSerializer(serializers.ModelSerializer):
             validated_data['user'] = request.user
         else:
             # Create or get a default user for testing
-            from django.contrib.auth.models import User
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
             default_user, created = User.objects.get_or_create(
                 username='testuser',
                 defaults={'email': 'test@example.com'}
