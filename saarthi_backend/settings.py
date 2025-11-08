@@ -66,29 +66,29 @@ TEMPLATES = [
 WSGI_APPLICATION = 'saarthi_backend.wsgi.application'
 
 # Database - Using SQLite for testing to avoid PostGIS dependency issues
-load_dotenv() # Load environment variables from .env file
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-# For PostgreSQL with PostGIS (uncomment when ready for production):
+# load_dotenv() # Load environment variables from .env file
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-#         'NAME': os.environ.get('DB_NAME', 'neondb'),
-#         'USER': os.environ.get('DB_USER', 'neondb_owner'),
-#         'PASSWORD': os.environ.get('DB_PASSWORD', 'npg_fAEp5sDdxye1'),
-#         'HOST': os.environ.get('DB_HOST', 'ep-late-sunset-adxskpl3-pooler.c-2.us-east-1.aws.neon.tech'),
-#         'PORT': os.environ.get('DB_PORT', '5432'),
-#         'OPTIONS': {
-#             'sslmode': 'require',
-#             'channel_binding': 'require',
-#         },
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
+# For PostgreSQL with PostGIS (uncomment when ready for production):
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': os.environ.get('DB_NAME', 'neondb'),
+        'USER': os.environ.get('DB_USER', 'neondb_owner'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'npg_fAEp5sDdxye1'),
+        'HOST': os.environ.get('DB_HOST', 'ep-late-sunset-adxskpl3-pooler.c-2.us-east-1.aws.neon.tech'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
+        'OPTIONS': {
+            'sslmode': 'require',
+            'channel_binding': 'require',
+        },
+    }
+}
 
 
 AUTH_PASSWORD_VALIDATORS = [
