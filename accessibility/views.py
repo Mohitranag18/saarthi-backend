@@ -31,7 +31,7 @@ def haversine_distance(lat1, lon1, lat2, lon2):
 
 class AccessibilityReportListCreateView(APIView):
     parser_classes = [MultiPartParser, FormParser, JSONParser]
-    permission_classes = [allowany]
+    permission_classes = [IsAuthenticated]
 
 
     def get(self, request):
