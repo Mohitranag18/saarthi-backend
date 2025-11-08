@@ -19,8 +19,8 @@ class AccessibilityReport(models.Model):
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    latitude = models.DecimalField(max_digits=9, decimal_places=8)
-    longitude = models.DecimalField(max_digits=9, decimal_places=8)
+    latitude = models.DecimalField(max_digits=11, decimal_places=8)
+    longitude = models.DecimalField(max_digits=11, decimal_places=8)
     problem_type = models.CharField(max_length=100)
     disability_types = models.JSONField(default=list)
     severity = models.CharField(max_length=20, choices=SEVERITY_CHOICES, default='Medium')
@@ -53,10 +53,10 @@ class RouteFeedback(models.Model):
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    start_lat = models.DecimalField(max_digits=9, decimal_places=8)
-    start_lon = models.DecimalField(max_digits=9, decimal_places=8)
-    end_lat = models.DecimalField(max_digits=9, decimal_places=8)
-    end_lon = models.DecimalField(max_digits=9, decimal_places=8)
+    start_lat = models.DecimalField(max_digits=11, decimal_places=8)
+    start_lon = models.DecimalField(max_digits=11, decimal_places=8)
+    end_lat = models.DecimalField(max_digits=11, decimal_places=8)
+    end_lon = models.DecimalField(max_digits=11, decimal_places=8)
     disability_type = models.CharField(max_length=50)
     rating = models.IntegerField(choices=RATING_CHOICES)
     comment = models.TextField(blank=True)
