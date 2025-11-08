@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
 from django.db.models import Q
 from math import radians, cos, sin, asin, sqrt
 import requests
@@ -14,6 +15,7 @@ from .serializers import (
     RouteFeedbackSerializer,
     RouteCalculationSerializer,
 )
+from .storage import supabase_storage
 
 
 def haversine_distance(lat1, lon1, lat2, lon2):
@@ -28,7 +30,8 @@ def haversine_distance(lat1, lon1, lat2, lon2):
 
 
 class AccessibilityReportListCreateView(APIView):
-    # permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+    # permission_classes = [IsAuthenticated]  # Temporarily disabled for testing
 
     def get(self, request):
         """Get all reports, optionally filtered by location and radius."""
