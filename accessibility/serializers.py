@@ -120,21 +120,21 @@ class AccessibilityReportCreateSerializer(serializers.ModelSerializer):
         photo = validated_data.pop('photo', None)
         
         # Handle user assignment (get or create default user)
-        # request = self.context.get('request')
-        # if request and hasattr(request, 'user') and request.user.is_authenticated:
-        #     validated_data['user'] = request.user
-        # else:
-        #     # Create or get a default user for testing
-        #     from django.contrib.auth import get_user_model
-        #     User = get_user_model()
-        #     default_user, created = User.objects.get_or_create(
-        #         username='testuser',
-        #         defaults={'email': 'test@example.com'}
-        #     )
-        #     validated_data['user'] = default_user
-        User = get_user_model()
-        validated_data['user'] = User.objects.first()  # just use the first user
-        return super().create(validated_data)
+        request = self.context.get('request')
+        if request and hasattr(request, 'user') and request.user.is_authenticated:
+            validated_data['user'] = request.user
+        else:
+            # Create or get a default user for testing
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            default_user, created = User.objects.get_or_create(
+                username='testuser',
+                defaults={'email': 'test@example.com'}
+            )
+            validated_data['user'] = default_user
+        # User = get_user_model()
+        # validated_data['user'] = User.objects.first()  # just use the first user
+        # return super().create(validated_data)
         
         # Handle photo upload to Supabase
         if photo:
