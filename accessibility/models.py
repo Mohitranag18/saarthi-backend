@@ -19,8 +19,8 @@ class AccessibilityReport(models.Model):
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    latitude = models.DecimalField(max_digits=9, decimal_places=6)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6)
+    latitude = models.DecimalField(max_digits=9, decimal_places=8)
+    longitude = models.DecimalField(max_digits=9, decimal_places=8)
     problem_type = models.CharField(max_length=100)
     disability_types = models.JSONField(default=list)
     severity = models.CharField(max_length=20, choices=SEVERITY_CHOICES, default='Medium')
