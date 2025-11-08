@@ -16,7 +16,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
-    # 'django.contrib.admin',  # Temporarily disabled to avoid GIS dependency
+    'django.contrib.admin',  # Temporarily disabled to avoid GIS dependency
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',

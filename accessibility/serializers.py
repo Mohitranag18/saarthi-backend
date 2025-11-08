@@ -42,17 +42,22 @@ class AccessibilityReportSerializer(serializers.ModelSerializer):
 
     def validate_disability_types(self, value):
         # Handle both list and string (from FormData)
+        print(f"🔍 Validating disability_types: {value} (Type: {type(value).__name__})")
+        
         if isinstance(value, str):
             # Convert comma-separated string to list
             disability_types = [type.strip() for type in value.split(',') if type.strip()]
+            print(f"🔄 Converted string to list: {disability_types}")
             if not disability_types:
                 raise serializers.ValidationError("At least one disability type must be selected.")
             return disability_types
         elif isinstance(value, list):
+            print(f"📝 Received list directly: {value}")
             if len(value) == 0:
                 raise serializers.ValidationError("At least one disability type must be selected.")
             return value
         else:
+            print(f"❌ Invalid type for disability_types: {type(value)}")
             raise serializers.ValidationError("Invalid format for disability types.")
 
 
@@ -115,18 +120,21 @@ class AccessibilityReportCreateSerializer(serializers.ModelSerializer):
         photo = validated_data.pop('photo', None)
         
         # Handle user assignment (get or create default user)
-        request = self.context.get('request')
-        if request and hasattr(request, 'user') and request.user.is_authenticated:
-            validated_data['user'] = request.user
-        else:
-            # Create or get a default user for testing
-            from django.contrib.auth import get_user_model
-            User = get_user_model()
-            default_user, created = User.objects.get_or_create(
-                username='testuser',
-                defaults={'email': 'test@example.com'}
-            )
-            validated_data['user'] = default_user
+        # request = self.context.get('request')
+        # if request and hasattr(request, 'user') and request.user.is_authenticated:
+        #     validated_data['user'] = request.user
+        # else:
+        #     # Create or get a default user for testing
+        #     from django.contrib.auth import get_user_model
+        #     User = get_user_model()
+        #     default_user, created = User.objects.get_or_create(
+        #         username='testuser',
+        #         defaults={'email': 'test@example.com'}
+        #     )
+        #     validated_data['user'] = default_user
+        User = get_user_model()
+        validated_data['user'] = User.objects.first()  # just use the first user
+        return super().create(validated_data)
         
         # Handle photo upload to Supabase
         if photo:

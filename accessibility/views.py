@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny as allowany
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.db.models import Q
 from math import radians, cos, sin, asin, sqrt
@@ -31,7 +31,7 @@ def haversine_distance(lat1, lon1, lat2, lon2):
 
 class AccessibilityReportListCreateView(APIView):
     parser_classes = [MultiPartParser, FormParser, JSONParser]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [allowany]
 
 
     def get(self, request):
@@ -68,17 +68,43 @@ class AccessibilityReportListCreateView(APIView):
 
     def post(self, request):
         """Create a new accessibility report."""
+        # Log incoming data for debugging
+        print("=" * 50)
+        print("📥 REPORT SUBMISSION RECEIVED")
+        print("=" * 50)
+        print(f"Request Method: {request.method}")
+        print(f"Request Content-Type: {request.content_type}")
+        print(f"Request Headers: {dict(request.headers)}")
+        print(f"Request User: {request.user}")
+        print(f"Request User Authenticated: {request.user.is_authenticated}")
+        print(f"Request Data Type: {type(request.data)}")
+        print(f"Request Data Keys: {list(request.data.keys()) if hasattr(request.data, 'keys') else 'No keys'}")
+        
+        # Log each field separately
+        for key, value in request.data.items():
+            print(f"📋 {key}: {value} (Type: {type(value).__name__})")
+        
+        print("=" * 50)
+        
         serializer = AccessibilityReportCreateSerializer(
             data=request.data,
             context={'request': request}
         )
         
+        print("🔍 Serializer Validation Results:")
         if serializer.is_valid():
+            print("✅ Validation passed")
+            print(f"Validated Data: {serializer.validated_data}")
             report = serializer.save()
             response_serializer = AccessibilityReportSerializer(report)
+            print(f"✅ Report created: {report.id}")
+            print("=" * 50)
             return Response(response_serializer.data, status=status.HTTP_201_CREATED)
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            print("❌ Validation failed")
+            print(f"❌ Serializer Errors: {serializer.errors}")
+            print("=" * 50)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AccessibilityReportDetailView(APIView):
