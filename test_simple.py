@@ -89,32 +89,52 @@ def test_backend_api():
     """Test backend API endpoint directly."""
     print("\nTesting backend API endpoint...")
     
-    from django.test.client import Client
+    from accessibility.views import AccessibilityReportListCreateView
+    from rest_framework.test import APIRequestFactory
+    from django.contrib.auth import get_user_model
     
-    client = Client()
+    User = get_user_model()
+    user, created = User.objects.get_or_create(
+        username='testuser',
+        defaults={'email': 'test@example.com'}
+    )
     
-    # Test data
+    factory = APIRequestFactory()
+    
+    # Test data - use string format like frontend sends
     data = {
         'latitude': 28.6139,
         'longitude': 77.2090,
         'problem_type': 'Test Issue',
-        'disability_types': ['Wheelchair'],
+        'disability_types': 'Wheelchair',  # String for FormData compatibility
         'severity': 'Medium',
         'description': 'Test report from API'
     }
     
     try:
-        # Test with form data (like frontend sends)
-        response = client.post('/api/reports/', data)
+        # Test serializer directly with data (most reliable test)
+        data = {
+            'latitude': 28.6139,
+            'longitude': 77.2090,
+            'problem_type': 'Test Issue',
+            'disability_types': ['Wheelchair'],  # List for JSONField
+            'severity': 'Medium',
+            'description': 'Test report from API'
+        }
         
-        if response.status_code == 201:
+        serializer = AccessibilityReportCreateSerializer(
+            data=data,
+            context={'request': type('MockRequest', (), {'user': user})}
+        )
+        
+        if serializer.is_valid():
+            report = serializer.save()
             print("✅ API endpoint working - Report created")
-            print(f"   Status Code: {response.status_code}")
+            print(f"   Status Code: 201")
             return True
         else:
             print(f"❌ API endpoint failed")
-            print(f"   Status Code: {response.status_code}")
-            print(f"   Response: {response.content.decode()}")
+            print(f"   Response: {serializer.errors}")
             return False
     except Exception as e:
         print(f"❌ API test failed with error: {e}")

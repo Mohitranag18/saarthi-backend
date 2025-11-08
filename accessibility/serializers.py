@@ -39,9 +39,19 @@ class AccessibilityReportSerializer(serializers.ModelSerializer):
         return value
 
     def validate_disability_types(self, value):
-        if not isinstance(value, list) or len(value) == 0:
-            raise serializers.ValidationError("At least one disability type must be selected.")
-        return value
+        # Handle both list and string (from FormData)
+        if isinstance(value, str):
+            # Convert comma-separated string to list
+            disability_types = [type.strip() for type in value.split(',') if type.strip()]
+            if not disability_types:
+                raise serializers.ValidationError("At least one disability type must be selected.")
+            return disability_types
+        elif isinstance(value, list):
+            if len(value) == 0:
+                raise serializers.ValidationError("At least one disability type must be selected.")
+            return value
+        else:
+            raise serializers.ValidationError("Invalid format for disability types.")
 
 
 class AccessibilityReportCreateSerializer(serializers.ModelSerializer):
@@ -62,6 +72,21 @@ class AccessibilityReportCreateSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'photo_url': {'required': False, 'allow_null': True}
         }
+
+    def validate_disability_types(self, value):
+        # Handle both list and string (from FormData)
+        if isinstance(value, str):
+            # Convert comma-separated string to list
+            disability_types = [type.strip() for type in value.split(',') if type.strip()]
+            if not disability_types:
+                raise serializers.ValidationError("At least one disability type must be selected.")
+            return disability_types
+        elif isinstance(value, list):
+            if len(value) == 0:
+                raise serializers.ValidationError("At least one disability type must be selected.")
+            return value
+        else:
+            raise serializers.ValidationError("Invalid format for disability types.")
 
     def validate_photo(self, value):
         """Validate uploaded photo."""

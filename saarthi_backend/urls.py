@@ -1,10 +1,10 @@
-from django.contrib import admin
+# from django.contrib import admin  # Temporarily disabled
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # path('admin/', admin.site.urls),  # Temporarily disabled
     path('api/users/', include('users.urls')),
     path('api/', include('accessibility.urls')),
 ]

@@ -31,7 +31,8 @@ def haversine_distance(lat1, lon1, lat2, lon2):
 
 class AccessibilityReportListCreateView(APIView):
     parser_classes = [MultiPartParser, FormParser]
-    # permission_classes = [IsAuthenticated]  # Temporarily disabled for testing
+    permission_classes = [IsAuthenticated]
+
 
     def get(self, request):
         """Get all reports, optionally filtered by location and radius."""
@@ -81,7 +82,7 @@ class AccessibilityReportListCreateView(APIView):
 
 
 class AccessibilityReportDetailView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_object(self, pk):
         try:
@@ -148,7 +149,7 @@ class AccessibilityReportDetailView(APIView):
 
 
 class RouteCalculationView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         """Calculate accessible routes between two points."""
@@ -314,7 +315,7 @@ class RouteCalculationView(APIView):
 
 
 class RouteFeedbackView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         """Submit feedback for a route."""
@@ -334,7 +335,7 @@ class RouteFeedbackView(APIView):
 
 
 class WeatherView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         """Get current weather for a location."""
