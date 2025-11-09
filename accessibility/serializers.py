@@ -135,13 +135,17 @@ class AccessibilityReportCreateSerializer(serializers.ModelSerializer):
         
         # Handle photo upload to Supabase
         if photo:
+            import logging
+            logger = logging.getLogger(__name__)
+            
+            logger.info(f"Processing photo upload: {photo.name}")
+            
             if not supabase_storage.is_configured():
                 # Log warning but allow creation without photo
-                import logging
-                logger = logging.getLogger(__name__)
                 logger.warning("Supabase storage not configured, skipping photo upload")
             else:
                 try:
+                    logger.info("Starting Supabase upload...")
                     photo_url = supabase_storage.upload_file(photo)
                     if photo_url:
                         validated_data['photo_url'] = photo_url
@@ -152,6 +156,7 @@ class AccessibilityReportCreateSerializer(serializers.ModelSerializer):
                 except Exception as e:
                     # Log error but allow creation without photo
                     logger.error(f"Exception during photo upload to Supabase: {e}")
+                    logger.exception("Full exception details:")
         
         return super().create(validated_data)
 

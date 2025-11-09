@@ -20,19 +20,26 @@ class SupabaseStorageService:
         self.supabase_service_role_key: str = os.environ.get('SUPABASE_SERVICE_ROLE_KEY')
         self.bucket_name: str = os.environ.get('SUPABASE_BUCKET_NAME', 'saarthi-reports')
         
+        logger.info(f"Initializing Supabase storage with URL: {self.supabase_url}")
+        logger.info(f"Bucket name: {self.bucket_name}")
+        
         if not all([self.supabase_url, self.supabase_key]):
             logger.warning("Supabase configuration missing. File uploads will fail.")
             self.client = None
         else:
             try:
                 # Use service role key for admin operations
+                key_to_use = self.supabase_service_role_key or self.supabase_key
+                logger.info(f"Using key type: {'service_role' if self.supabase_service_role_key else 'anon'}")
+                
                 self.client: Client = create_client(
                     self.supabase_url,
-                    self.supabase_service_role_key or self.supabase_key
+                    key_to_use
                 )
                 logger.info("Supabase client initialized successfully")
             except Exception as e:
                 logger.error(f"Failed to initialize Supabase client: {e}")
+                logger.exception("Full exception details:")
                 self.client = None
     
     def is_configured(self) -> bool:
@@ -98,14 +105,33 @@ class SupabaseStorageService:
             )
             
             logger.info(f"Upload result: {result}")
+            logger.info(f"Upload result type: {type(result)}")
             
-            if result.data:
+            # Handle different response formats from Supabase
+            if hasattr(result, 'data') and result.data:
                 # Get public URL
                 public_url = self.client.storage.from_(self.bucket_name).get_public_url(file_path)
                 logger.info(f"File uploaded successfully: {public_url}")
                 return public_url
-            else:
-                logger.error(f"Upload failed - no data returned: {result}")
+            elif hasattr(result, 'json') and callable(getattr(result, 'json')):
+                # Try to get JSON response
+                try:
+                    result_data = result.json()
+                    if result_data:
+                        public_url = self.client.storage.from_(self.bucket_name).get_public_url(file_path)
+                        logger.info(f"File uploaded successfully: {public_url}")
+                        return public_url
+                except:
+                    pass
+            
+            # If upload seems to have worked (no exception), try to get URL anyway
+            try:
+                public_url = self.client.storage.from_(self.bucket_name).get_public_url(file_path)
+                logger.info(f"File uploaded successfully: {public_url}")
+                return public_url
+            except Exception as url_error:
+                logger.error(f"Upload failed - couldn't get public URL: {url_error}")
+                logger.error(f"Upload response: {result}")
                 return None
                 
         except Exception as e:

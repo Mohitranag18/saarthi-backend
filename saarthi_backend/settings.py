@@ -162,7 +162,7 @@ CORS_ALLOW_CREDENTIALS = True
 SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
 SUPABASE_KEY = os.environ.get('SUPABASE_KEY', '')
 SUPABASE_SERVICE_ROLE_KEY = os.environ.get('SUPABASE_SERVICE_ROLE_KEY', '')
-SUPABASE_BUCKET_NAME = os.environ.get('SUPABASE_BUCKET_NAME', 'saarthi-reports')
+SUPABASE_BUCKET_NAME = os.environ.get('SUPABASE_BUCKET_NAME', 'report-images')
 
 # File upload settings
 MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10MB
