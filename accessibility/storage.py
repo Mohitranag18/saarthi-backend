@@ -55,26 +55,49 @@ class SupabaseStorageService:
             return None
         
         try:
+            # Log file details for debugging
+            logger.info(f"Uploading file: {file_obj.name}, size: {file_obj.size}, content_type: {getattr(file_obj, 'content_type', 'unknown')}")
+            
             # Generate unique file path if not provided
             if not file_path:
                 file_extension = os.path.splitext(file_obj.name)[1]
                 unique_filename = f"{uuid.uuid4()}{file_extension}"
                 file_path = f"reports/{unique_filename}"
             
+            logger.info(f"File path for upload: {file_path}")
+            
             # Read file content
             file_content = file_obj.read()
+            logger.info(f"File content size: {len(file_content)} bytes")
             
             # Reset file pointer for potential reuse
             file_obj.seek(0)
             
+            # Determine content type
+            content_type = getattr(file_obj, 'content_type', None)
+            if not content_type:
+                # Try to determine from file extension
+                file_extension = os.path.splitext(file_obj.name)[1].lower()
+                content_type_map = {
+                    '.jpg': 'image/jpeg',
+                    '.jpeg': 'image/jpeg',
+                    '.png': 'image/png',
+                    '.gif': 'image/gif',
+                    '.webp': 'image/webp',
+                }
+                content_type = content_type_map.get(file_extension, 'image/jpeg')
+            
             # Upload to Supabase
+            logger.info(f"Starting upload to bucket: {self.bucket_name}")
             result = self.client.storage.from_(self.bucket_name).upload(
                 path=file_path,
                 file=file_content,
                 file_options={
-                    "content-type": file_obj.content_type or "image/jpeg"
+                    "content-type": content_type
                 }
             )
+            
+            logger.info(f"Upload result: {result}")
             
             if result.data:
                 # Get public URL
@@ -82,11 +105,12 @@ class SupabaseStorageService:
                 logger.info(f"File uploaded successfully: {public_url}")
                 return public_url
             else:
-                logger.error(f"Upload failed: {result}")
+                logger.error(f"Upload failed - no data returned: {result}")
                 return None
                 
         except Exception as e:
             logger.error(f"Error uploading file to Supabase: {e}")
+            logger.exception("Full exception details:")
             return None
     
     def delete_file(self, file_path: str) -> bool:

@@ -132,9 +132,6 @@ class AccessibilityReportCreateSerializer(serializers.ModelSerializer):
                 defaults={'email': 'test@example.com'}
             )
             validated_data['user'] = default_user
-        # User = get_user_model()
-        # validated_data['user'] = User.objects.first()  # just use the first user
-        # return super().create(validated_data)
         
         # Handle photo upload to Supabase
         if photo:
@@ -144,14 +141,17 @@ class AccessibilityReportCreateSerializer(serializers.ModelSerializer):
                 logger = logging.getLogger(__name__)
                 logger.warning("Supabase storage not configured, skipping photo upload")
             else:
-                photo_url = supabase_storage.upload_file(photo)
-                if photo_url:
-                    validated_data['photo_url'] = photo_url
-                else:
+                try:
+                    photo_url = supabase_storage.upload_file(photo)
+                    if photo_url:
+                        validated_data['photo_url'] = photo_url
+                        logger.info(f"Photo uploaded successfully: {photo_url}")
+                    else:
+                        # Log error but allow creation without photo
+                        logger.error("Failed to upload photo to Supabase - no URL returned")
+                except Exception as e:
                     # Log error but allow creation without photo
-                    import logging
-                    logger = logging.getLogger(__name__)
-                    logger.error("Failed to upload photo to Supabase")
+                    logger.error(f"Exception during photo upload to Supabase: {e}")
         
         return super().create(validated_data)
 
